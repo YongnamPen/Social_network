@@ -6,6 +6,9 @@ import { SLoginPage } from "./LoginPage.style";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm, SubmitHandler } from "react-hook-form";
+import { useLoginUserMutation } from "../../store/Api/authApi";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ILoginForm {
   userEmail: string;
@@ -21,6 +24,8 @@ const loginScheme = yup.object({
 });
 
 export const LoginPage = () => {
+  const navigate = useNavigate();
+  const [loginUser,{data: userdata}] = useLoginUserMutation();
   const {
     control,
     handleSubmit,
@@ -33,12 +38,19 @@ export const LoginPage = () => {
       userPassword: "",
     },
   });
+  useEffect(() => {
+    if (userdata) {
+      navigate("/main-page");
+    }
+  }, [userdata]);
   const onLoginSubmit: SubmitHandler<ILoginForm> = (data) => {
     const payload = {
-      useremail: data.userEmail,
-      userpassword: data.userPassword,
+      email: data.userEmail,
+      password: data.userPassword,
     };
-    console.log(payload);
+    loginUser(payload);
+    console.log(userdata);
+    
   };
 
   return (

@@ -6,6 +6,9 @@ import { SRegistrationPage } from "./RegistrationPage.style";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useLoginUserMutation } from "../../store/Api/authApi";
+import { useEffect } from "react";
 
 interface IRegistrationForm {
   userEmail: string;
@@ -26,6 +29,8 @@ const registrationScheme = yup.object({
 });
 
 export const RegistrationPage = () => {
+  const navigate = useNavigate();
+  const [loginUser, { data: userdata }] = useLoginUserMutation();
   const {
     control,
     handleSubmit,
@@ -39,13 +44,18 @@ export const RegistrationPage = () => {
       userPassword: "",
     },
   });
+  useEffect(() => {
+    if (userdata) {
+      navigate("/");
+    }
+  }, [userdata]);
   const onRegistrationSubmit: SubmitHandler<IRegistrationForm> = (data) => {
     const payload = {
-      userEmail: data.userEmail,
-      userPhone: data.userPhone,
-      userPassword: data.userPassword,
+      email: data.userEmail,
+      phone: data.userPhone,
+      password: data.userPassword,
     };
-    console.log(payload);
+    loginUser(payload);
   };
   return (
     <SRegistrationPage>
